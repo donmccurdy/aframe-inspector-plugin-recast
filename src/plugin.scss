@@ -1,0 +1,48 @@
+$bgColor: #2b2b2b;
+$bgAccentColor: #222222;
+$primaryColor: #868686;
+$accentColor: #ed3161;
+
+$panelLeft: 230px;
+$panelRight: 331px;
+$panelHeight: 200px;
+
+.recast-plugin-panel {
+  position: absolute;
+  z-index: 99998;
+  bottom: 0;
+  left: $panelLeft;
+  right: $panelRight;
+  height: $panelHeight;
+
+  background: $bgColor;
+  color: $primaryColor;
+
+  box-sizing: border-box;
+  border-left: 1px solid $bgAccentColor;
+  border-right: 1px solid $bgAccentColor;
+
+  .panel-header {
+    background: $bgAccentColor;
+    text-transform: uppercase;
+    padding: 0.5em;
+  }
+
+  .panel-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-column-gap: 1em;
+    padding: 1em;
+  }
+
+  .panel-field {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .panel-btn {
+    position: absolute;
+    bottom: 1em;
+    right: 1em;
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "aframe-inspector-plugin-recast",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify",
+    "build": "browserify src/plugin.js -o dist/aframe-inspector-plugin-recast.js -t scssify -t stringify"
+  },
+  "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "browserify": "^14.5.0",
+    "budo": "^10.0.4",
+    "scssify": "^3.0.1",
+    "stringify": "^5.1.0"
+  },
+  "dependencies": {}
+}
