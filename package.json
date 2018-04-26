@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify",
+    "dev": "concurrently \"budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify\" \"nodemon function.js\"",
     "build": "browserify src/plugin.js -o dist/aframe-inspector-plugin-recast.js -t scssify -t stringify"
   },
   "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
@@ -12,8 +12,14 @@
   "devDependencies": {
     "browserify": "^14.5.0",
     "budo": "^10.0.4",
+    "concurrently": "^3.5.1",
+    "nodemon": "^1.17.3",
     "scssify": "^3.0.1",
     "stringify": "^5.1.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.3",
+    "node_recast": "^1.0.12"
+  }
 }

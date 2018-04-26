@@ -12,11 +12,11 @@ fetch('./assets/tmp-pruned.obj')
   .then((text) => (objContentTMP = text));
 
 const DEFAULT_SETTINGS = {
-  cellSize: 0.3,
-  cellHeight: 0.2,
+  cellSize: 0.03,
+  cellHeight: 0.02,
   agentHeight: 0.8,
   agentRadius: 0.2,
-  agentMaxClimb: 2,
+  agentMaxClimb: 0.5,
   agentMaxSlope: 30,
 };
 
@@ -43,7 +43,6 @@ class RecastPlugin {
       label.textContent = input.value = settings[key];
       input.addEventListener('input', () => {
         settings[key] = label.textContent = Number(input.value);
-        recast[`set_${key}`](settings[key]);
       });
     });
 
@@ -68,34 +67,36 @@ class RecastPlugin {
     this.printGraph(content);
 
     const exporter = new OBJExporter();
-    const objContent = exporter.parse(content);
-    recast.OBJDataLoader(objContent, () => {
+    const loader = new THREE.OBJLoader();
+    const body = exporter.parse(content);
+    const params = this.serialize(this.settings);
 
-      console.time('[RecastPlugin] recast.buildSolo');
-      recast.buildSolo();
-      console.timeEnd('[RecastPlugin] recast.buildSolo');
+    this.pending = true;
+    fetch(`http://localhost:3000/_/build/?${params}`, {method: 'post', body: body})
+      .then((response) => response.json())
+      .then((json) => {
+        if (!json.ok) throw new Error('Something went wrong');
 
-      recast.getNavMeshVertices(recast.cb((vertices) => {
+        const navMeshGroup = loader.parse(json.obj);
+        const meshes = [];
+
+        navMeshGroup.traverse((node) => {
+          if (node.isMesh) meshes.push(node);
+        });
+
+        if (meshes.length !== 1) {
+          console.warn('[aframe-inspector-plugin-recast] Expected 1 navmesh but got ' + meshes.length);
+          if (meshes.length === 0) return;
+        }
 
         if (this.navMesh) this.sceneEl.object3D.remove(this.navMesh);
 
-        const numVerticesUsed = (vertices.length - (vertices.length % 3));
-        const position = new Float32Array(numVerticesUsed * 3);
-        for (let i = 0; i < numVerticesUsed; i++) {
-          position[i * 3 + 0] = vertices[i].x;
-          position[i * 3 + 1] = vertices[i].y;
-          position[i * 3 + 2] = vertices[i].z;
-        }
-
-        const geometry = new THREE.BufferGeometry();
-        geometry.addAttribute('position', new THREE.BufferAttribute(position, 3));
-        const material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
-
-        this.navMesh = new THREE.Mesh(geometry, material);
+        this.navMesh = meshes[0];
+        this.navMesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
         this.sceneEl.object3D.add(this.navMesh);
-
-      }));
-    });
+      })
+      .catch((e) => console.error(e))
+      .then(() => (this.pending = false));
 
   }
 
@@ -137,6 +138,16 @@ class RecastPlugin {
     node.children.forEach((child) => this.printGraph(child));
     console.groupEnd();
 
+  }
+
+  serialize (obj) {
+    const str = [];
+    for (let p in obj) {
+      if (obj.hasOwnProperty(p)) {
+        str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]));
+      }
+    }
+    return str.join('&');
   }
 }
 
