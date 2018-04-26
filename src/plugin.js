@@ -1,15 +1,10 @@
-/* global recast, THREE */
+/* global THREE, AFRAME */
 
 const panelTpl = require('./plugin.html');
 const GLTFExporter = require('../lib/GLTFExporter');
 const OBJExporter = require('../lib/OBJExporter');
 
 require('./plugin.scss');
-
-let objContentTMP;
-fetch('./assets/tmp-pruned.obj')
-  .then((response) => response.text())
-  .then((text) => (objContentTMP = text));
 
 const DEFAULT_SETTINGS = {
   cellSize: 0.03,
@@ -56,12 +51,14 @@ class RecastPlugin {
    * a preview of the navigation mesh in the scene.
    */
   rebuild () {
-    const content = this.sceneEl.object3D.clone();
-    const pruned = [];
-    content.traverse((node) => {
-      if (node.isCamera || node.isLight) pruned.push(node);
+    const content = new THREE.Scene();
+    this.sceneEl.object3D.updateMatrixWorld();
+    this.sceneEl.object3D.traverse((node) => {
+      if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
+      const clone = node.clone();
+      clone.matrix.copy(node.matrixWorld);
+      content.add(clone);
     });
-    pruned.forEach((node) => node.parent.remove(node));
 
     console.info('Pruned scene graph:');
     this.printGraph(content);
@@ -149,14 +146,25 @@ class RecastPlugin {
     }
     return str.join('&');
   }
+
+  setVisible (visible) {
+    this.panelEl.style.display = visible ? '' : 'none';
+  }
 }
 
-// Bootstrap.
-document.addEventListener('DOMContentLoaded', () => {
-  const tmpEl = document.createElement('div');
-  tmpEl.innerHTML = panelTpl;
-  const panelEl = tmpEl.children[0];
-  document.body.appendChild(panelEl);
-  const sceneEl = document.querySelector('a-scene');
-  window.recastPlugin = new RecastPlugin(panelEl, sceneEl);
+AFRAME.registerComponent('inspector-plugin-recast', {
+  init: function () {
+    const tmpEl = document.createElement('div');
+    tmpEl.innerHTML = panelTpl;
+    const panelEl = tmpEl.children[0];
+    document.body.appendChild(panelEl);
+    this.plugin = new RecastPlugin(panelEl, this.el);
+  },
+  pause: function () {
+    this.plugin.setVisible(true);
+  },
+  play: function () {
+    this.plugin.setVisible(false);
+  }
 });
+
