@@ -4,7 +4,6 @@ const recast = require('./lib/RecastCLI.node');
 
 const PORT = process.env.PORT || 3000;
 
-
 // ---------------------------------------- //
 
 const app = express();
@@ -32,12 +31,7 @@ app.post('/_/build/', (req, res) => {
     req.query.agentRadius,
     req.query.agentMaxClimb,
     req.query.agentMaxSlope
-  ]
-    .map(Number)
-    .filter(Number.isFinite);
-
-
-  console.log(config, req.params);
+  ].map(Number);
 
   const input = String(req.body).replace(/\r?\n/g, '@');
 
