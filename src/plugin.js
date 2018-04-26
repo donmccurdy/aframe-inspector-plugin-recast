@@ -18,11 +18,12 @@ const DEFAULT_SETTINGS = {
  * Recast navigation mesh plugin.
  */
 class RecastPlugin {
-  constructor (panelEl, sceneEl) {
+  constructor (panelEl, sceneEl, host) {
     this.panelEl = panelEl;
     this.sceneEl = sceneEl;
     this.settings = Object.assign({}, DEFAULT_SETTINGS);
     this.navMesh = null;
+    this.host = host;
     this.bindListeners();
   }
 
@@ -72,7 +73,7 @@ class RecastPlugin {
     const params = this.serialize(this.settings);
 
     this.pending = true;
-    fetch(`http://localhost:3000/_/build/?${params}`, {method: 'post', body: body})
+    fetch(`${this.host}/v1/build/?${params}`, {method: 'post', body: body})
       .then((response) => response.json())
       .then((json) => {
         if (!json.ok) throw new Error('Something went wrong');
@@ -156,12 +157,15 @@ class RecastPlugin {
 }
 
 AFRAME.registerComponent('inspector-plugin-recast', {
+  schema: {
+    serviceURL: {default: 'https://recast-api.donmccurdy.com'},
+  },
   init: function () {
     const tmpEl = document.createElement('div');
     tmpEl.innerHTML = panelTpl;
     const panelEl = tmpEl.children[0];
     document.body.appendChild(panelEl);
-    this.plugin = new RecastPlugin(panelEl, this.el);
+    this.plugin = new RecastPlugin(panelEl, this.el, this.data.serviceURL);
   },
   pause: function () {
     this.plugin.setVisible(true);

@@ -20,7 +20,7 @@ app.use(bodyParser.text({limit: '50mb'}));
 
 // ---------------------------------------- //
 
-app.post('/_/build/', (req, res) => {
+app.post('/v1/build/', (req, res) => {
 
   if (!req.body) return res.sendStatus(400);
 
