@@ -1,7 +1,6 @@
 /* global THREE, AFRAME */
 
 const panelTpl = require('./plugin.html');
-const GLTFExporter = require('../lib/GLTFExporter');
 const OBJExporter = require('../lib/OBJExporter');
 
 require('./plugin.scss');
@@ -41,9 +40,13 @@ class RecastPlugin {
       });
     });
 
-    // Rebuild on click.
-    const btnEl = this.panelEl.querySelector('[name=build]');
-    btnEl.addEventListener('click', () => this.rebuild());
+    // Rebuild.
+    const rebuildBtnEl = this.panelEl.querySelector('[name=build]');
+    rebuildBtnEl.addEventListener('click', () => this.rebuild());
+
+    // Export.
+    const exportBtnEl = this.panelEl.querySelector('[name=export]');
+    exportBtnEl.addEventListener('click', () => this.exportGLTF());
   }
 
   /**
@@ -100,10 +103,10 @@ class RecastPlugin {
   /** Export to glTF 2.0. */
   exportGLTF () {
     if (!this.navMesh) throw new Error('[RecastPlugin] No navigation mesh.');
-    const exporter = new GLTFExporter();
+    const exporter = new THREE.GLTFExporter();
     exporter.parse(this.navMesh, (gltfContent) => {
       this._download('navmesh.gltf', JSON.stringify(gltfContent));
-    });
+    }, {binary: false});
   }
 
   /** Export to OBJ. */
