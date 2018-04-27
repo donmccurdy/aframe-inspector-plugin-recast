@@ -34,10 +34,9 @@ class RecastPlugin {
     // Update labels when sliders change.
     Object.keys(settings).forEach((key) => {
       const input = this.panelEl.querySelector(`input[name=${key}]`);
-      const label = this.panelEl.querySelector(`[data-bind=${key}]`);
-      label.textContent = input.value = settings[key];
+      input.value = settings[key];
       input.addEventListener('input', () => {
-        settings[key] = label.textContent = Number(input.value);
+        settings[key] = Number(input.value);
       });
     });
 
@@ -55,14 +54,7 @@ class RecastPlugin {
    * a preview of the navigation mesh in the scene.
    */
   rebuild () {
-    const content = new THREE.Scene();
-    this.sceneEl.object3D.updateMatrixWorld();
-    this.sceneEl.object3D.traverse((node) => {
-      if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
-      const clone = node.clone();
-      clone.matrix.copy(node.matrixWorld);
-      content.add(clone);
-    });
+    const content = this.gatherScene();
 
     console.info('Pruned scene graph:');
     this.printGraph(content);
@@ -98,6 +90,45 @@ class RecastPlugin {
       })
       .catch((e) => console.error(e))
       .then(() => (this.pending = false));
+
+  }
+
+  /** Collect all (or selected) objects from scene. */
+  gatherScene () {
+    const selectorInput = this.panelEl.querySelector(`input[name=selector]`);
+    const selector = selectorInput.value;
+
+    const content = new THREE.Scene();
+    this.sceneEl.object3D.updateMatrixWorld();
+
+    if ( selector ) {
+
+      const selected = this.sceneEl.querySelectorAll(selector);
+      const visited = new Set();
+
+      [].forEach.call(selected, (el) => {
+        if (!el.object3D) return;
+        el.object3D.traverse((node) => {
+          if (visited.has(node)) return;
+          collect(node);
+          visited.add(node);
+        });
+      });
+
+    } else {
+
+      this.sceneEl.object3D.traverse(collect);
+
+    }
+
+    function collect (node) {
+      if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
+      const clone = node.clone();
+      clone.matrix.copy(node.matrixWorld);
+      content.add(clone);
+    }
+
+    return content;
 
   }
 

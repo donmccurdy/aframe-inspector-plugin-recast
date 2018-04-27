@@ -33,11 +33,17 @@ $panelHeight: 200px;
     grid-template-columns: 1fr 1fr 1fr;
     grid-column-gap: 1em;
     padding: 1em;
+    max-width: 500px;
   }
 
   .panel-field {
     display: flex;
     flex-direction: column;
+    padding-bottom: 1em;
+  }
+
+  .panel-field-label {
+    padding-bottom: 0.2em;
   }
 
   .panel-btn-wrap {
