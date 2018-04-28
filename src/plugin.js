@@ -6,8 +6,8 @@ const OBJExporter = require('../lib/OBJExporter');
 require('./plugin.scss');
 
 const DEFAULT_SETTINGS = {
-  cellSize: 0.03,
-  cellHeight: 0.02,
+  cellSize: 0.3,
+  cellHeight: 0.2,
   agentHeight: 0.8,
   agentRadius: 0.2,
   agentMaxClimb: 0.5,
@@ -54,6 +54,7 @@ class RecastPlugin {
    * a preview of the navigation mesh in the scene.
    */
   rebuild () {
+    this.clearNavMesh();
     const content = this.gatherScene();
 
     console.info('Pruned scene graph:');
@@ -86,7 +87,7 @@ class RecastPlugin {
 
         this.navMesh = meshes[0];
         this.navMesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
-        this.sceneEl.object3D.add(this.navMesh);
+        this.injectNavMesh(this.navMesh);
       })
       .catch((e) => console.error(e))
       .then(() => (this.pending = false));
@@ -130,6 +131,24 @@ class RecastPlugin {
 
     return content;
 
+  }
+
+  injectNavMesh (navMesh) {
+    let navMeshEl = this.sceneEl.querySelector('[nav-mesh]');
+    if (!navMeshEl) {
+      navMeshEl = document.createElement('a-entity');
+      navMeshEl.setAttribute('nav-mesh', '');
+      this.sceneEl.appendChild(navMeshEl);
+    }
+    setTimeout(() => {
+      navMeshEl.setObject3D('mesh', navMesh);
+      navMeshEl.components['nav-mesh'].loadNavMesh();
+    }, 20);
+  }
+
+  clearNavMesh () {
+    const navMeshEl = this.sceneEl.querySelector('[nav-mesh]');
+    if (navMeshEl) navMeshEl.removeObject3D('mesh');
   }
 
   /** Export to glTF 2.0. */
