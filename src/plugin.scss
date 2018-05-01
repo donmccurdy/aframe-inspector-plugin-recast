@@ -51,4 +51,27 @@ $panelHeight: 200px;
     bottom: 1em;
     right: 1em;
   }
+
+  .recast-spinner {
+    z-index: 1000;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    position: absolute;
+    left: 0;
+    top: 0;
+    display: flex;
+    align-items: center;
+
+    opacity: 0.0;
+    pointer-events: none;
+    transition: opacity ease 0.2s;
+
+    @import "spinner";
+  }
+
+  .recast-spinner.active {
+    opacity: 1.0;
+    pointer-events: all;
+  }
 }

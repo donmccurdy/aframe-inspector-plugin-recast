@@ -21,6 +21,7 @@ class RecastPlugin {
   constructor (panelEl, sceneEl, host) {
     this.panelEl = panelEl;
     this.sceneEl = sceneEl;
+    this.spinnerEl = panelEl.querySelector('.recast-spinner');
     this.settings = Object.assign({}, DEFAULT_SETTINGS);
     this.navMesh = null;
     this.host = host;
@@ -65,7 +66,7 @@ class RecastPlugin {
     const body = exporter.parse(content);
     const params = this.serialize(this.settings);
 
-    this.pending = true;
+    this.showSpinner();
     fetch(`${this.host}/v1/build/?${params}`, {method: 'post', body: body})
       .then((response) => response.json())
       .then((json) => {
@@ -90,7 +91,7 @@ class RecastPlugin {
         this.injectNavMesh(this.navMesh);
       })
       .catch((e) => console.error(e))
-      .then(() => (this.pending = false));
+      .then(() => this.hideSpinner());
 
   }
 
@@ -203,6 +204,14 @@ class RecastPlugin {
 
   setVisible (visible) {
     this.panelEl.style.display = visible ? '' : 'none';
+  }
+
+  showSpinner () {
+    this.spinnerEl.classList.add('active');
+  }
+
+  hideSpinner () {
+    this.spinnerEl.classList.remove('active');
   }
 }
 
