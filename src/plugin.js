@@ -90,7 +90,10 @@ class RecastPlugin {
         this.navMesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
         this.injectNavMesh(this.navMesh);
       })
-      .catch((e) => console.error(e))
+      .catch((e) => {
+        console.error(e);
+        alert('Oops, something went wrong.');
+      })
       .then(() => this.hideSpinner());
 
   }
