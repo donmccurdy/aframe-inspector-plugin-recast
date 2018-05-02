@@ -1,11 +1,14 @@
 {
   "name": "aframe-inspector-plugin-recast",
   "version": "0.0.1",
-  "description": "",
+  "description": "A-Frame Inspector plugin for creating navigation meshes",
+  "repository": "donmccurdy/aframe-inspector-plugin-recast",
   "main": "index.js",
   "scripts": {
+    "start": "node function.js",
     "dev": "concurrently \"budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify\" \"nodemon function.js\"",
-    "build": "browserify src/plugin.js -o dist/aframe-inspector-plugin-recast.js -t scssify -t stringify"
+    "dist": "browserify src/plugin.js -o dist/aframe-inspector-plugin-recast.js -t scssify -t stringify",
+    "deploy": "now --docker && now alias"
   },
   "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
   "license": "MIT",
@@ -18,8 +21,12 @@
     "stringify": "^5.1.0"
   },
   "dependencies": {
+    "@donmccurdy/recast": "0.0.1",
     "body-parser": "^1.18.2",
-    "express": "^4.16.3",
-    "node_recast": "^1.0.12"
+    "express": "^4.16.3"
+  },
+  "now": {
+    "alias": "recast-api.donmccurdy.com",
+    "public": true
   }
 }

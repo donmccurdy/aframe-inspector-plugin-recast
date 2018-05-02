@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const recast = require('./lib/RecastCLI.node');
+const recast = require('@donmccurdy/recast');
 
 const PORT = process.env.PORT || 3000;
 
