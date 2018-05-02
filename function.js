@@ -18,6 +18,8 @@ app.use(function(req, res, next) {
 
 app.use(bodyParser.text({limit: '50mb'}));
 
+app.use(express.static('public'));
+
 // ---------------------------------------- //
 
 app.post('/v1/build/', (req, res) => {
