@@ -8,6 +8,7 @@ const OBJExporter = require('../lib/OBJExporter');
 require('./plugin.scss');
 
 const MAX_EXTENT = 500;
+const MAX_FILESIZE = 25000000;
 
 class RecastError extends Error {}
 
@@ -65,6 +66,13 @@ class RecastPlugin {
     const body = exporter.parse(content, {includeNormals: false, includeUVs: false});
     const params = this.serialize(this.settings);
 
+    if (body.length > MAX_FILESIZE) {
+      const errorMsg = `Upload size cannot exceed ${MAX_FILESIZE / 1e6}mb. `
+        + `Please filter objects or create the navmesh locally.`;
+      window.alert(errorMsg);
+      throw new Error(errorMsg);
+    }
+
     this.showSpinner();
     fetch(`${this.host}/v1/build/?${params}`, {method: 'post', body: body})
       .then((response) => response.json())
@@ -86,7 +94,7 @@ class RecastPlugin {
         if (this.navMesh) this.sceneEl.object3D.remove(this.navMesh);
 
         this.navMesh = meshes[0];
-        this.navMesh.material = new THREE.MeshBasicMaterial({color: Math.random() * 0xffffff});
+        this.navMesh.material = new THREE.MeshNormalMaterial();
         this.injectNavMesh(this.navMesh);
       })
       .catch((e) => {
