@@ -33,6 +33,7 @@ app.post('/v1/build/', (req, res) => {
   try {
 
     config = RecastConfig.map((param) => {
+      assert.ok(param.name, req.query[param.name]);
       const value = Number(req.query[param.name]);
       assert.number(param.name, value).range(param.min, param.max);
       return value;

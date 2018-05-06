@@ -7,7 +7,13 @@
         {{ name }}:
         <span data-bind="{{ name }}"></span>
       </span>
-      <input type="number" min="{{ min }}" max="{{ max }}" step="{{ step }}" name="{{ name }}" value="" required>
+      <input type="number"
+             min="{{ min }}"
+             max="{{ max }}"
+             step="{{ step }}"
+             name="{{ name }}"
+             value="{{ default }}"
+             required>
     </label>
     {{/each}}
     <label class="panel-field">

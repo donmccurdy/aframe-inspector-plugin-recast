@@ -7,14 +7,7 @@ const OBJExporter = require('../lib/OBJExporter');
 
 require('./plugin.scss');
 
-const DEFAULT_SETTINGS = {
-  cellSize: 0.3,
-  cellHeight: 0.2,
-  agentHeight: 0.8,
-  agentRadius: 0.2,
-  agentMaxClimb: 0.5,
-  agentMaxSlope: 30,
-};
+const MAX_EXTENT = 500;
 
 class RecastError extends Error {}
 
@@ -26,7 +19,7 @@ class RecastPlugin {
     this.panelEl = panelEl;
     this.sceneEl = sceneEl;
     this.spinnerEl = panelEl.querySelector('.recast-spinner');
-    this.settings = Object.assign({}, DEFAULT_SETTINGS);
+    this.settings = {};
     this.navMesh = null;
     this.host = host;
     this.bindListeners();
@@ -37,11 +30,11 @@ class RecastPlugin {
     const settings = this.settings;
 
     // Update labels when sliders change.
-    Object.keys(settings).forEach((key) => {
-      const input = this.panelEl.querySelector(`input[name=${key}]`);
-      input.value = settings[key];
+    RecastConfig.forEach(({name}) => {
+      const input = this.panelEl.querySelector(`input[name=${name}]`);
+      settings[name] = input.value;
       input.addEventListener('input', () => {
-        settings[key] = Number(input.value);
+        settings[name] = Number(input.value);
       });
     });
 
@@ -145,10 +138,24 @@ class RecastPlugin {
     }
 
     function collect (node) {
+      // Filter out non-meshes and Inspector elements.
       if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
       const clone = node.clone();
-      clone.matrix.copy(node.matrixWorld);
+      node.matrixWorld.decompose(clone.position, clone.quaternion, clone.scale);
       content.add(clone);
+    }
+
+    const boundingSphere = new THREE.Box3()
+      .setFromObject( content )
+      .getBoundingSphere();
+
+    if ( boundingSphere.radius > MAX_EXTENT ) {
+
+      const errorMsg = `Scene must have a bounding radius less than ${MAX_EXTENT}m. `
+        + `Reduce size, filter large objects out, or run the plugin locally.`;
+      window.alert(errorMsg);
+      throw new Error(errorMsg);
+
     }
 
     return content;
