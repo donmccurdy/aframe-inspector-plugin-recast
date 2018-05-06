@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const assert = require('fluent-assert');
 const recast = require('@donmccurdy/recast');
+const RecastConfig = require('./src/recast-config');
 
 const PORT = process.env.PORT || 3000;
 
@@ -26,14 +28,23 @@ app.post('/v1/build/', (req, res) => {
 
   if (!req.body) return res.sendStatus(400);
 
-  const config =[
-    req.query.cellSize,
-    req.query.cellHeight,
-    req.query.agentHeight,
-    req.query.agentRadius,
-    req.query.agentMaxClimb,
-    req.query.agentMaxSlope
-  ].map(Number);
+  let config;
+
+  try {
+
+    config = RecastConfig.map((param) => {
+      const value = Number(req.query[param.name]);
+      assert.number(param.name, value).range(param.min, param.max);
+      return value;
+    });
+
+  } catch (e) {
+
+    console.error(e);
+    res.send({ok: false, message: e.message});
+    return;
+
+  }
 
   const input = String(req.body).replace(/\r?\n/g, '@');
 
@@ -50,7 +61,7 @@ app.post('/v1/build/', (req, res) => {
   } catch (e) {
 
     console.error(e);
-    res.send({ok: false});
+    res.send({ok: false, message: 'Failed to build navigation mesh.'});
 
   }
 

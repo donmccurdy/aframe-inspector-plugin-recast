@@ -1,50 +1,22 @@
 <section class="recast-plugin-panel">
   <header class="panel-header">Plugin: NavMesh Builder</header>
-  <div class="panel-content">
+  <form class="panel-content">
+    {{#each RecastConfig}}
     <label class="panel-field">
       <span class="panel-field-label">
-        cellSize:
-        <span data-bind="cellSize"></span>
+        {{ name }}:
+        <span data-bind="{{ name }}"></span>
       </span>
-      <input type="number" min="0.1" max="3" step="0.01" name="cellSize" value="">
+      <input type="number" min="{{ min }}" max="{{ max }}" step="{{ step }}" name="{{ name }}" value="" required>
     </label>
-    <label class="panel-field">
-      <span class="panel-field-label">
-        cellHeight:
-      </span>
-      <input type="number" min="0.1" max="3" step="0.01" name="cellHeight" value="">
-    </label>
-    <label class="panel-field">
-      <span class="panel-field-label">
-        agentHeight:
-      </span>
-      <input type="number" min="0.1" max="3" step="0.01" name="agentHeight" value="">
-    </label>
-    <label class="panel-field">
-      <span class="panel-field-label">
-        agentRadius:
-      </span>
-      <input type="number" min="0.1" max="3" step="0.01" name="agentRadius" value="">
-    </label>
-    <label class="panel-field">
-      <span class="panel-field-label">
-        agentMaxClimb:
-      </span>
-      <input type="number" min="0.1" max="5" step="0.01" name="agentMaxClimb" value="">
-    </label>
-    <label class="panel-field">
-      <span class="panel-field-label">
-        agentMaxSlope:
-      </span>
-      <input type="number" min="0" max="90" name="agentMaxSlope" value="">
-    </label>
+    {{/each}}
     <label class="panel-field">
       <span class="panel-field-label">
         selector:
       </span>
       <input type="text" name="selector" value="" placeholder="*">
     </label>
-  </div>
+  </form>
   <div class="panel-btn-wrap">
     <button name="build" class="panel-btn">Build</button>
     <button name="export" class="panel-btn">Export</button>

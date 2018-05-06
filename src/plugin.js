@@ -1,5 +1,7 @@
 /* global THREE, AFRAME */
 
+const Handlebars = require('handlebars');
+const RecastConfig = require('./recast-config');
 const panelTpl = require('./plugin.html');
 const OBJExporter = require('../lib/OBJExporter');
 
@@ -13,6 +15,8 @@ const DEFAULT_SETTINGS = {
   agentMaxClimb: 0.5,
   agentMaxSlope: 30,
 };
+
+class RecastError extends Error {}
 
 /**
  * Recast navigation mesh plugin.
@@ -55,6 +59,8 @@ class RecastPlugin {
    * a preview of the navigation mesh in the scene.
    */
   rebuild () {
+    this.validateForm();
+
     this.clearNavMesh();
     const content = this.gatherScene();
 
@@ -70,7 +76,7 @@ class RecastPlugin {
     fetch(`${this.host}/v1/build/?${params}`, {method: 'post', body: body})
       .then((response) => response.json())
       .then((json) => {
-        if (!json.ok) throw new Error('Something went wrong');
+        if (!json.ok) throw new RecastError(json.message);
 
         const navMeshGroup = loader.parse(json.obj);
         const meshes = [];
@@ -92,10 +98,22 @@ class RecastPlugin {
       })
       .catch((e) => {
         console.error(e);
-        alert('Oops, something went wrong.');
+        e instanceof RecastError
+          ? window.alert(e.message)
+          : window.alert('Oops, something went wrong.');
       })
       .then(() => this.hideSpinner());
 
+  }
+
+  /** Validate all form inputs. */
+  validateForm () {
+    const form = this.panelEl.querySelector('.panel-content');
+    if (!form.checkValidity()) {
+      const errorMsg = 'Please correct errors navmesh configuration.';
+      window.alert(errorMsg);
+      throw new Error(errorMsg);
+    }
   }
 
   /** Collect all (or selected) objects from scene. */
@@ -142,6 +160,7 @@ class RecastPlugin {
     if (!navMeshEl) {
       navMeshEl = document.createElement('a-entity');
       navMeshEl.setAttribute('nav-mesh', '');
+      navMeshEl.setAttribute('id', 'nav-mesh');
       this.sceneEl.appendChild(navMeshEl);
     }
     setTimeout(() => {
@@ -223,9 +242,10 @@ AFRAME.registerComponent('inspector-plugin-recast', {
     serviceURL: {default: 'https://recast-api.donmccurdy.com'},
   },
   init: function () {
-    const tmpEl = document.createElement('div');
-    tmpEl.innerHTML = panelTpl;
-    const panelEl = tmpEl.children[0];
+    const wrapEl = document.createElement('div');
+    const template = Handlebars.compile(panelTpl);
+    wrapEl.innerHTML = template({RecastConfig: RecastConfig});
+    const panelEl = wrapEl.children[0];
     document.body.appendChild(panelEl);
     this.plugin = new RecastPlugin(panelEl, this.el, this.data.serviceURL);
   },

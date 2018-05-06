@@ -40,6 +40,11 @@ $panelHeight: 200px;
     display: flex;
     flex-direction: column;
     padding-bottom: 1em;
+
+    input:invalid {
+      border-bottom: 1px solid crimson;
+      background: rgba(255, 0, 0, 0.25);
+    }
   }
 
   .panel-field-label {
