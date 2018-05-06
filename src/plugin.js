@@ -62,7 +62,7 @@ class RecastPlugin {
 
     const exporter = new OBJExporter();
     const loader = new THREE.OBJLoader();
-    const body = exporter.parse(content);
+    const body = exporter.parse(content, {includeNormals: false, includeUVs: false});
     const params = this.serialize(this.settings);
 
     this.showSpinner();
