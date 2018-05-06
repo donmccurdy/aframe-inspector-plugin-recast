@@ -162,6 +162,10 @@ class RecastPlugin {
 
   }
 
+  /**
+   * Injects navigation mesh into the scene, creating entity if needed.
+   * @param  {THREE.Mesh} navMesh
+   */
   injectNavMesh (navMesh) {
     let navMeshEl = this.sceneEl.querySelector('[nav-mesh]');
     if (!navMeshEl) {
@@ -176,6 +180,7 @@ class RecastPlugin {
     }, 20);
   }
 
+  /** Removes navigation mesh, if any, from scene. */
   clearNavMesh () {
     const navMeshEl = this.sceneEl.querySelector('[nav-mesh]');
     if (navMeshEl) navMeshEl.removeObject3D('mesh');
@@ -213,6 +218,10 @@ class RecastPlugin {
     document.body.removeChild(el);
   }
 
+  /**
+   * Prints debug graph of a scene subtree.
+   * @param  {THREE.Object3D} node
+   */
   printGraph (node) {
 
     console.group(' <' + node.type + '> ' + node.name);
@@ -221,6 +230,11 @@ class RecastPlugin {
 
   }
 
+  /**
+   * Converts an object to URI query parameters.
+   * @param  {Object<string, *>} obj
+   * @return {string}
+   */
   serialize (obj) {
     const str = [];
     for (let p in obj) {
@@ -231,19 +245,32 @@ class RecastPlugin {
     return str.join('&');
   }
 
+  /**
+   * Sets visibility of the plugin panel.
+   * @param {boolean} visible
+   */
   setVisible (visible) {
     this.panelEl.style.display = visible ? '' : 'none';
   }
 
+  /** Shows the loading spinner. */
   showSpinner () {
     this.spinnerEl.classList.add('active');
   }
 
+  /** Hides the loading spinner. */
   hideSpinner () {
     this.spinnerEl.classList.remove('active');
   }
 }
 
+/**
+ * Plugin component wrapper.
+ *
+ * The A-Frame Inspector does not technically have a plugin
+ * API, and so we use this component to detect events (play/pause) indicating
+ * that the inspector is (probably) opened or closed.
+ */
 AFRAME.registerComponent('inspector-plugin-recast', {
   schema: {
     serviceURL: {default: 'https://recast-api.donmccurdy.com'},

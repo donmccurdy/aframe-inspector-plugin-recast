@@ -30,6 +30,7 @@ app.post('/v1/build/', (req, res) => {
 
   let config;
 
+  // Validate configuration.
   try {
 
     config = RecastConfig.map((param) => {
@@ -49,6 +50,7 @@ app.post('/v1/build/', (req, res) => {
 
   const input = String(req.body).replace(/\r?\n/g, '@');
 
+  // Load input and construct navmesh.
   try {
 
     recast.load(input);
