@@ -198,7 +198,10 @@ class RecastPlugin {
   exportGLTF () {
     if (!this.navMesh) throw new Error('[RecastPlugin] No navigation mesh.');
     const exporter = new THREE.GLTFExporter();
+    const backupMaterial = this.navMesh.material;
+    this.navMesh.material = new THREE.MeshStandardMaterial({color: 0x808080, metalness: 0, roughness: 1});
     exporter.parse(this.navMesh, (gltfContent) => {
+      this.navMesh.material = backupMaterial;
       this._download('navmesh.gltf', JSON.stringify(gltfContent));
     }, {binary: false});
   }
