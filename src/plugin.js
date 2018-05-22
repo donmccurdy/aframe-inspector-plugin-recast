@@ -4,6 +4,7 @@ const Handlebars = require('handlebars');
 const RecastConfig = require('./recast-config');
 const panelTpl = require('./plugin.html');
 const OBJExporter = require('../lib/OBJExporter');
+const BufferGeometryUtils = require('../lib/BufferGeometryUtils');
 
 require('./plugin.scss');
 
@@ -61,17 +62,9 @@ class RecastPlugin {
     console.info('Pruned scene graph:');
     this.printGraph(content);
 
-    const exporter = new OBJExporter();
     const loader = new THREE.OBJLoader();
-    const body = exporter.parse(content, {includeNormals: false, includeUVs: false});
+    const body = this.serializeScene(content);
     const params = this.serialize(this.settings);
-
-    if (body.length > MAX_FILESIZE) {
-      const errorMsg = `Upload size cannot exceed ${MAX_FILESIZE / 1e6}mb. `
-        + `Please filter objects or create the navmesh locally.`;
-      window.alert(errorMsg);
-      throw new Error(errorMsg);
-    }
 
     this.showSpinner();
     fetch(`${this.host}/v1/build/?${params}`, {method: 'post', body: body})
@@ -111,9 +104,7 @@ class RecastPlugin {
   validateForm () {
     const form = this.panelEl.querySelector('.panel-content');
     if (!form.checkValidity()) {
-      const errorMsg = 'Please correct errors navmesh configuration.';
-      window.alert(errorMsg);
-      throw new Error(errorMsg);
+      this.fail('Please correct errors navmesh configuration.');
     }
   }
 
@@ -124,6 +115,8 @@ class RecastPlugin {
 
     const content = new THREE.Scene();
     this.sceneEl.object3D.updateMatrixWorld();
+
+    this.markInspectorNodes();
 
     if ( selector ) {
 
@@ -147,6 +140,7 @@ class RecastPlugin {
 
     function collect (node) {
       // Filter out non-meshes and Inspector elements.
+      if (node.userData._isInspectorNode) return;
       if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
       const clone = node.clone();
       node.matrixWorld.decompose(clone.position, clone.quaternion, clone.scale);
@@ -159,15 +153,96 @@ class RecastPlugin {
 
     if ( boundingSphere.radius > MAX_EXTENT ) {
 
-      const errorMsg = `Scene must have a bounding radius less than ${MAX_EXTENT}m. `
-        + `Reduce size, filter large objects out, or run the plugin locally.`;
-      window.alert(errorMsg);
-      throw new Error(errorMsg);
+      this.fail(
+        `Scene must have a bounding radius less than ${MAX_EXTENT}m. `
+        + `Reduce size, filter large objects out, or run the plugin locally.`
+      );
 
     }
 
     return content;
 
+  }
+
+  /**
+   * @param {Object3D} scene
+   * @return {FormData}
+   */
+  serializeScene (scene) {
+    const geometries = [];
+
+    // Traverse the scene and collect mesh geometry.
+    scene.traverse((node) => {
+      if (!node.isMesh) return;
+
+      let geometry = node.geometry;
+      let attributes = geometry.attributes;
+
+      // Convert everything to BufferGeometry.
+      if (!geometry.isBufferGeometry) {
+        geometry = new THREE.BufferGeometry().fromGeometry(geometry);
+        attributes = geometry.attributes;
+      }
+
+      // Skip geometry without 3D position data, like text.
+      if (!attributes.position || attributes.position.itemSize !== 3) return;
+
+      // Convert everything to triangle-soup for simplicity.
+      if (geometry.index) geometry = geometry.toNonIndexed();
+
+      // Create a position-only version of the geometry, because geometry with
+      // different attributes can't be merged.  Apply transforms to geometry.
+      const cloneGeometry = new THREE.BufferGeometry();
+      cloneGeometry.addAttribute('position', geometry.attributes.position.clone());
+      cloneGeometry.applyMatrix(node.matrixWorld);
+      geometry = cloneGeometry;
+
+      geometries.push(geometry);
+    });
+
+    // Merge geometries.
+    const geometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
+
+    if (!geometry) this.fail('No mesh data found.');
+
+    // Create index.
+    const position = geometry.attributes.position.array;
+    const index = new Uint32Array( position.length / 3 );
+    for (let i = 0; i < index.length; i++) index[i] = i + 1;
+
+    // Compute and validate scene size.
+    const bodyLength = position.length * Float32Array.BYTES_PER_ELEMENT
+      + index.length * Int32Array.BYTES_PER_ELEMENT;
+    if (bodyLength === 0) this.fail('No mesh data found.');
+    if (bodyLength > MAX_FILESIZE) {
+      this.fail(
+        `Upload size cannot exceed ${MAX_FILESIZE / 1e6}mb, found ${bodyLength}mb. `
+        + `Please filter objects or create the navmesh locally.`
+      );
+    }
+
+    // Convert vertices and index to Blobs, add to FormData, and return.
+    const positionBlob = new Blob([new Float32Array(position)], {type: 'application/octet-stream'});
+    const indexBlob = new Blob([new Int32Array(index)], {type: 'application/octet-stream'});
+    const formData = new FormData();
+    formData.append('position', positionBlob);
+    formData.append('index', indexBlob);
+    return formData;
+  }
+
+  /**
+   * Attempt to pre-mark inspector-injected nodes. Unfortunately
+   * there is no reliable way to do this; we have to assume the first
+   * object named 'picker' is one of them, walk up the tree, and mark
+   * everything below its root.
+   */
+  markInspectorNodes () {
+    const scene = this.sceneEl.object3D;
+    let inspectorNode = scene.getObjectByName('picker');
+    while (inspectorNode.parent !== scene) inspectorNode = inspectorNode.parent;
+    inspectorNode.traverse((node) => {
+      node.userData._isInspectorNode = true;
+    });
   }
 
   /**
@@ -184,7 +259,8 @@ class RecastPlugin {
     }
     setTimeout(() => {
       navMeshEl.setObject3D('mesh', navMesh);
-      navMeshEl.components['nav-mesh'].loadNavMesh();
+      const navMeshComponent = navMeshEl.components['nav-mesh'];
+      if (navMeshComponent) navMeshComponent.loadNavMesh();
     }, 20);
   }
 
@@ -272,6 +348,15 @@ class RecastPlugin {
   /** Hides the loading spinner. */
   hideSpinner () {
     this.spinnerEl.classList.remove('active');
+  }
+
+  /**
+   * Displays a user-facing message then throws an error.
+   * @param {string} msg
+   */
+  fail (msg) {
+    window.alert(msg);
+    throw new Error(msg);
   }
 }
 
