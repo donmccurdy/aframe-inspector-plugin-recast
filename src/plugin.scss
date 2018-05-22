@@ -1,19 +1,26 @@
-$bgColor: #2b2b2b;
+$bgColor: #323232;
 $bgAccentColor: #222222;
 $primaryColor: #868686;
 $accentColor: #ed3161;
+$buttonColor: #262626;
+$buttonTextColor: #bcbcbc;
+$buttonTextHoverColor: #1faaf2;
 
 $panelLeft: 230px;
-$panelRight: 331px;
-$panelHeight: 200px;
+$panelRight: 0; // Actual: 331px.
+$panelHeight: 220px;
 
 .recast-plugin-panel {
   position: absolute;
-  z-index: 99998;
+  z-index: 9998; // A-Frame canvas and inspector share same zIndex.
   bottom: 0;
-  left: $panelLeft;
-  right: $panelRight;
+  width: 100%;
   height: $panelHeight;
+  left: 0;
+  right: 0;
+
+  padding-left: $panelLeft;
+  padding-right: $panelRight;
 
   background: $bgColor;
   color: $primaryColor;
@@ -54,7 +61,19 @@ $panelHeight: 200px;
   .panel-btn-wrap {
     position: absolute;
     bottom: 1em;
-    right: 1em;
+    left: calc(1em + #{$panelLeft});
+  }
+
+  .panel-btn {
+    background: $buttonColor;
+    color: $buttonTextColor;
+    font-size: 11px;
+    padding: 5px;
+    border: none;
+
+    &:hover {
+      color: $buttonTextHoverColor;
+    }
   }
 
   .recast-spinner {
