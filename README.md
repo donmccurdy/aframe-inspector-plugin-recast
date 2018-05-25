@@ -2,7 +2,7 @@
 
 > WORK IN PROGRESS: This plugin is not yet stable or ready for use.
 
-A plugin for the A-Frame Inspector, allowing creation of a navigation mesh while from an existing A-Frame scene. This plugin should not be used at runtime, in the final scene — instead:
+A plugin for the A-Frame Inspector, allowing creation of a navigation mesh while from an existing A-Frame scene. This plugin should not be used at runtime in the live scene, but only during scene creation.
 
 1. Create your scene
 2. Use this plugin to create and test a navigation mesh
