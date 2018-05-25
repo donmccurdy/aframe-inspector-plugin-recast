@@ -2,7 +2,7 @@
   <header class="panel-header">Plugin: NavMesh Builder</header>
   <form class="panel-content">
     {{#each RecastConfig}}
-    <label class="panel-field">
+    <label class="panel-field" title="{{ description }}">
       <span class="panel-field-label">
         {{ name }}:
         <span data-bind="{{ name }}"></span>
@@ -24,8 +24,8 @@
     </label>
   </form>
   <div class="panel-btn-wrap">
-    <button name="build" class="panel-btn">Build</button>
-    <button name="export" class="panel-btn">Export</button>
+    <button name="build" class="panel-btn" title="Rebuild navigation mesh.">Build</button>
+    <button name="export" class="panel-btn" title="Export navigation mesh to `.gltf` file.">Export</button>
   </div>
   <div class="recast-spinner">
     <!-- http://tobiasahlin.com/spinkit/ -->
