@@ -6,6 +6,7 @@ const panelTpl = require('./plugin.html');
 const OBJExporter = require('../lib/OBJExporter');
 const BufferGeometryUtils = require('../lib/BufferGeometryUtils');
 
+require('./components/nav-debug-pointer');
 require('./plugin.scss');
 
 const MAX_EXTENT = 500;
