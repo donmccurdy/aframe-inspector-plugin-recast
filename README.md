@@ -35,6 +35,20 @@ A navigation mesh helps AI agents navigate, and is one way of constraining first
 
 6. Load the navigation mesh into your finished scene with the [documentation in A-Frame Extras](https://github.com/donmccurdy/aframe-extras/tree/master/src/pathfinding).
 
+## Limits and performance
+
+This plugin sends scene geometry temporarily to a remote API for processing, and imposes limits on the size of the processed scene for that reason. Additionally, objects with large dimensions like `<a-sky/>` that are not intended for navigation should be omitted while creating the mesh — either by commenting them out, or using the `selector` input.
+
+If you need to create a navigation mesh for larger scenes, run the plugin's navmesh service locally after cloning this repository:
+
+```
+npm run dev
+```
+
+```html
+<a-scene inspector-plugin-recast="serviceURL: http://localhost:3000;"> ...
+```
+
 ## Debugging
 
 This plugin includes an additional component for teleporting around a navigation mesh, `nav-debug-pointer`. It can be used alongside `movement-controls` to test out the navigation mesh with FPS-style movement. The cursor will display in green while looking at the navigation mesh, red while looking away, and allows teleporting to any part of the navigation mesh. The `movement-controls` component supports clamping player WASD movement within the mesh. AI pathfinding is described in [further documentation](https://github.com/donmccurdy/aframe-extras/tree/master/src/pathfinding).
@@ -48,3 +62,5 @@ This plugin includes an additional component for teleporting around a navigation
   </a-entity>
 </a-entity>
 ```
+
+Adjust settings as needed if the navigation mesh is not appropriate. Final adjustments (correcting distortions, or adding/removing connections to particular areas) can also be applied in any modeling tool.
