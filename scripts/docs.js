@@ -2,11 +2,11 @@ const replace = require('replace');
 const config = require('../src/recast-config');
 
 const rows = config.map((p) => {
-  return `| ${p.name} | ${p.default} | ${p.min} — ${p.step} | ${p.description} |`;
+  return `| ${p.name} | ${p.default} | ${p.description} ${p.min} — ${p.step}. |`;
 });
 
-const content = `| property | default | range | description |
-|----------|---------|-------|-------------|
+const content = `| property | default | description |
+|----------|---------|-------------|
 ${rows.join('\n')}`;
 
 replace({
