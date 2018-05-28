@@ -9,6 +9,8 @@ A plugin for the A-Frame Inspector, allowing creation of a navigation mesh while
 3. Export the navigation mesh as a glTF or JSON file
 4. Load the final navigation mesh into your scene as a normal model
 
+![plugin screenshot](https://user-images.githubusercontent.com/1848368/40598442-a2d92fac-61fc-11e8-9dfe-4de1c56ee6e6.gif)
+
 ## Introduction
 
 A navigation mesh helps AI agents navigate, and is one way of constraining first-person controls and VR teleportation within a playable area. For information about using a navigation mesh in A-Frame, see [Pathfinding documentation in A-Frame Extras](https://github.com/donmccurdy/aframe-extras/tree/master/src/pathfinding).
