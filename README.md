@@ -76,3 +76,10 @@ This plugin includes an additional component for teleporting around a navigation
 ```
 
 Adjust settings as needed if the navigation mesh is not appropriate. Final adjustments (correcting distortions, or adding/removing connections to particular areas) can also be applied in any modeling tool.
+
+## Credits
+
+Thanks to:
+
+- [Recast Navigation](https://github.com/recastnavigation/recastnavigation), used for building navigation meshes.
+- [Jeff Ma](https://github.com/but0n) for creating a [Node.js-friendly build of Recast](https://github.com/but0n/recastCLI.js).
