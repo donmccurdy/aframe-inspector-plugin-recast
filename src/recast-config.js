@@ -17,7 +17,7 @@ const RecastConfig = [
   },
   {
     name: 'agentHeight',
-    default: 0.8,
+    default: 1.6,
     min: 0.1,
     max: 3,
     step: 0.01,
