@@ -37,6 +37,15 @@ A navigation mesh helps AI agents navigate, and is one way of constraining first
 
 6. Load the navigation mesh into your finished scene with the [documentation in A-Frame Extras](https://github.com/donmccurdy/aframe-extras/tree/master/src/pathfinding).
 
+## Configuration
+
+<!-- begin:config -->
+| property | default | range | description |
+|----------|---------|-------|-------------|
+| cellSize | 0.3 | 0.05 — 0.01 | Width/depth of voxel cells used to sample scene geometry. || cellHeight | 0.2 | 0.1 — 0.01 | Height of voxel cells used to sample scene geometry. || agentHeight | 1.6 | 0.1 — 0.01 | Minimum floor to 'ceiling' height that will still allow the floor area to be considered walkable. Permits detection of overhangs in the source geometry that make the geometry below un-walkable. The value is usually set to the maximum agent height. || agentRadius | 0.2 | 0.1 — 0.01 | The distance to erode/shrink the walkable area of the heightfield away from obstructions. In general, this is the closest any part of the final mesh should get to an obstruction in the source geometry. It is usually set to the maximum agent radius. Areas too narrow will be considered "blocked." || agentMaxClimb | 0.5 | 0.1 — 0.01 | Maximum ledge height that is considered to still be traversable. Allows the mesh to flow over low lying obstructions such as curbs and up/down stairways. The value is usually set to how far up/down an agent can step. || agentMaxSlope | 30 | 0 — 1 | The maximum slope that is considered walkable. |
+<!-- end:config -->
+
+
 ## Tips, limits, and performance
 
 This plugin sends scene geometry temporarily to a remote API for processing, and imposes limits on the size of the processed scene for that reason. Suggestions for getting started:

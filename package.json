@@ -9,7 +9,8 @@
     "dev": "concurrently \"budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify\" \"nodemon function.js\"",
     "dist": "browserify src/plugin.js -o public/aframe-inspector-plugin-recast.js -t scssify -t stringify",
     "predeploy": "npm run dist",
-    "deploy": "now --docker && now alias"
+    "deploy": "now --docker && now alias",
+    "docs": "node scripts/docs"
   },
   "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
   "license": "MIT",
@@ -18,6 +19,7 @@
     "budo": "^11.2.2",
     "concurrently": "^3.5.1",
     "nodemon": "^1.17.4",
+    "replace": "^1.0.0",
     "scssify": "^3.0.1",
     "stringify": "^5.2.0"
   },
