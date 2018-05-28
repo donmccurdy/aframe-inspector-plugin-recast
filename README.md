@@ -35,9 +35,20 @@ A navigation mesh helps AI agents navigate, and is one way of constraining first
 
 6. Load the navigation mesh into your finished scene with the [documentation in A-Frame Extras](https://github.com/donmccurdy/aframe-extras/tree/master/src/pathfinding).
 
-## Limits and performance
+## Tips, limits, and performance
 
-This plugin sends scene geometry temporarily to a remote API for processing, and imposes limits on the size of the processed scene for that reason. Additionally, objects with large dimensions like `<a-sky/>` that are not intended for navigation should be omitted while creating the mesh — either by commenting them out, or using the `selector` input.
+This plugin sends scene geometry temporarily to a remote API for processing, and imposes limits on the size of the processed scene for that reason. Suggestions for getting started:
+
+* Detailed objects with large filesize may be replaced with boxes to simplify creation of the navigation mesh.
+* Objects with large dimensions like `<a-sky/>`, that are not intended for navigation, should be omitted while creating the mesh.
+* To omit objects from the navigation mesh, delete them temporarily from the scene, or using the `selector` input.
+
+Improving results when something doesn't look right:
+
+* If the navigation mesh is too coarse or inaccurate, try reducing `cellSize` to increase precision.
+* `agentHeight` determines when overhangs will block movement. `agentRadius` determines how narrow a space is passable.
+* `agentMaxClimb` should be just greater than the largest stairsteps or curbs a character can walk over.
+* For more information, hover over any input in the plugin.
 
 If you need to create a navigation mesh for larger scenes, run the plugin's navmesh service locally after cloning this repository:
 
