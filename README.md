@@ -42,12 +42,12 @@ A navigation mesh helps AI agents navigate, and is one way of constraining first
 <!-- begin:config -->
 | property | default | description |
 |----------|---------|-------------|
-| cellSize | 0.3 | Width/depth of voxel cells used to sample scene geometry. 0.05 — 0.01. |
-| cellHeight | 0.2 | Height of voxel cells used to sample scene geometry. 0.1 — 0.01. |
-| agentHeight | 1.6 | Minimum floor to 'ceiling' height that will still allow the floor area to be considered walkable. Permits detection of overhangs in the source geometry that make the geometry below un-walkable. The value is usually set to the maximum agent height. 0.1 — 0.01. |
-| agentRadius | 0.2 | The distance to erode/shrink the walkable area of the heightfield away from obstructions. In general, this is the closest any part of the final mesh should get to an obstruction in the source geometry. It is usually set to the maximum agent radius. Areas too narrow will be considered "blocked." 0.1 — 0.01. |
-| agentMaxClimb | 0.5 | Maximum ledge height that is considered to still be traversable. Allows the mesh to flow over low lying obstructions such as curbs and up/down stairways. The value is usually set to how far up/down an agent can step. 0.1 — 0.01. |
-| agentMaxSlope | 30 | The maximum slope that is considered walkable. 0 — 1. |
+| cellSize | 0.3 | Width/depth of voxel cells used to sample scene geometry. 0.05 — 3. |
+| cellHeight | 0.2 | Height of voxel cells used to sample scene geometry. 0.1 — 3. |
+| agentHeight | 1.6 | Minimum floor to 'ceiling' height that will still allow the floor area to be considered walkable. Permits detection of overhangs in the source geometry that make the geometry below un-walkable. The value is usually set to the maximum agent height. 0.1 — 3. |
+| agentRadius | 0.2 | The distance to erode/shrink the walkable area of the heightfield away from obstructions. In general, this is the closest any part of the final mesh should get to an obstruction in the source geometry. It is usually set to the maximum agent radius. Areas too narrow will be considered "blocked." 0.1 — 3. |
+| agentMaxClimb | 0.5 | Maximum ledge height that is considered to still be traversable. Allows the mesh to flow over low lying obstructions such as curbs and up/down stairways. The value is usually set to how far up/down an agent can step. 0.1 — 5. |
+| agentMaxSlope | 30 | The maximum slope that is considered walkable. 0 — 90. |
 <!-- end:config -->
 
 
