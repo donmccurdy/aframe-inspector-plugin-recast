@@ -49,6 +49,7 @@ Improving results when something doesn't look right:
 * `agentHeight` determines when overhangs will block movement. `agentRadius` determines how narrow a space is passable.
 * `agentMaxClimb` should be just greater than the largest stairsteps or curbs a character can walk over.
 * For more information, hover over any input in the plugin.
+* Final cleanup, if necessary, may be done in a modeling tool like Blender.
 
 If you need to create a navigation mesh for larger scenes, run the plugin's navmesh service locally after cloning this repository:
 
