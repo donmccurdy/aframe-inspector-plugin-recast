@@ -7,7 +7,7 @@ $buttonTextColor: #bcbcbc;
 $buttonTextHoverColor: #1faaf2;
 
 $panelLeft: 230px;
-$panelRight: 0; // Actual: 331px.
+$panelRight: 331px;
 $panelHeight: 220px;
 
 .recast-plugin-panel {
@@ -20,7 +20,8 @@ $panelHeight: 220px;
   right: 0;
 
   padding-left: $panelLeft;
-  padding-right: $panelRight;
+  // padding-right: $panelRight;
+  padding-right: 0;
 
   background: $bgColor;
   color: $primaryColor;
@@ -78,11 +79,12 @@ $panelHeight: 220px;
 
   .recast-spinner {
     z-index: 1000;
-    width: 100%;
+    width: calc(100% - #{$panelLeft} - #{$panelRight});
     height: 100%;
     background: rgba(0, 0, 0, 0.5);
     position: absolute;
-    left: 0;
+    left: $panelLeft;
+    right: $panelRight;
     top: 0;
     display: flex;
     align-items: center;

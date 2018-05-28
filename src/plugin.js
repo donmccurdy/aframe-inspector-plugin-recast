@@ -90,6 +90,9 @@ class RecastPlugin {
         this.navMesh = meshes[0];
         this.navMesh.material = new THREE.MeshNormalMaterial();
         this.injectNavMesh(this.navMesh);
+
+        // Delay resolving, so first render blocks hiding the spinner.
+        return new Promise((resolve) => setTimeout(resolve, 30));
       })
       .catch((e) => {
         console.error(e);
