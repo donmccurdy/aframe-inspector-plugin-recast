@@ -3,14 +3,11 @@
 const Handlebars = require('handlebars');
 const RecastConfig = require('./recast-config');
 const panelTpl = require('./plugin.html');
+const GeometryReducer = require('./three-geometry-reducer');
 const OBJExporter = require('../lib/OBJExporter');
-const BufferGeometryUtils = require('../lib/BufferGeometryUtils');
 
 require('./components/nav-debug-pointer');
 require('./plugin.scss');
-
-const MAX_EXTENT = 500;
-const MAX_FILESIZE = 25000000;
 
 class RecastError extends Error {}
 
@@ -58,13 +55,8 @@ class RecastPlugin {
     this.validateForm();
 
     this.clearNavMesh();
-    const content = this.gatherScene();
-
-    console.info('Pruned scene graph:');
-    this.printGraph(content);
-
+    const body = this.serializeScene();
     const loader = new THREE.OBJLoader();
-    const body = this.serializeScene(content);
     const params = this.serialize(this.settings);
 
     this.showSpinner();
@@ -112,15 +104,18 @@ class RecastPlugin {
     }
   }
 
-  /** Collect all (or selected) objects from scene. */
-  gatherScene () {
+  /**
+   * Collect all (or selected) objects from scene.
+   * @return {FormData}
+   */
+  serializeScene () {
     const selectorInput = this.panelEl.querySelector(`input[name=selector]`);
     const selector = selectorInput.value;
 
-    const content = new THREE.Scene();
     this.sceneEl.object3D.updateMatrixWorld();
-
     this.markInspectorNodes();
+
+    const reducer = new GeometryReducer({ ignore: /^[XYZE]+|picker$/ });
 
     if ( selector ) {
 
@@ -131,99 +126,21 @@ class RecastPlugin {
         if (!el.object3D) return;
         el.object3D.traverse((node) => {
           if (visited.has(node)) return;
-          collect(node);
+          reducer.add(node);
           visited.add(node);
         });
       });
 
     } else {
 
-      this.sceneEl.object3D.traverse(collect);
+      this.sceneEl.object3D.traverse((o) => reducer.add(o));
 
     }
 
-    function collect (node) {
-      // Filter out non-meshes and Inspector elements.
-      if (node.userData._isInspectorNode) return;
-      if (!node.isMesh || node.name.match(/^[XYZE]+|picker$/)) return;
-      const clone = node.clone();
-      node.matrixWorld.decompose(clone.position, clone.quaternion, clone.scale);
-      content.add(clone);
-    }
+    console.info('Pruned scene graph:');
+    this.printGraph( reducer.getBuildList() );
 
-    const boundingSphere = new THREE.Box3()
-      .setFromObject( content )
-      .getBoundingSphere();
-
-    if ( boundingSphere.radius > MAX_EXTENT ) {
-
-      this.fail(
-        `Scene must have a bounding radius less than ${MAX_EXTENT}m. `
-        + `Reduce size, filter large objects out, or run the plugin locally.`
-      );
-
-    }
-
-    return content;
-
-  }
-
-  /**
-   * @param {Object3D} scene
-   * @return {FormData}
-   */
-  serializeScene (scene) {
-    const geometries = [];
-
-    // Traverse the scene and collect mesh geometry.
-    scene.traverse((node) => {
-      if (!node.isMesh) return;
-
-      let geometry = node.geometry;
-      let attributes = geometry.attributes;
-
-      // Convert everything to BufferGeometry.
-      if (!geometry.isBufferGeometry) {
-        geometry = new THREE.BufferGeometry().fromGeometry(geometry);
-        attributes = geometry.attributes;
-      }
-
-      // Skip geometry without 3D position data, like text.
-      if (!attributes.position || attributes.position.itemSize !== 3) return;
-
-      // Convert everything to triangle-soup for simplicity.
-      if (geometry.index) geometry = geometry.toNonIndexed();
-
-      // Create a position-only version of the geometry, because geometry with
-      // different attributes can't be merged.  Apply transforms to geometry.
-      const cloneGeometry = new THREE.BufferGeometry();
-      cloneGeometry.addAttribute('position', geometry.attributes.position.clone());
-      cloneGeometry.applyMatrix(node.matrixWorld);
-      geometry = cloneGeometry;
-
-      geometries.push(geometry);
-    });
-
-    // Merge geometries.
-    const geometry = BufferGeometryUtils.mergeBufferGeometries(geometries);
-
-    if (!geometry) this.fail('No mesh data found.');
-
-    // Create index.
-    const position = geometry.attributes.position.array;
-    const index = new Uint32Array( position.length / 3 );
-    for (let i = 0; i < index.length; i++) index[i] = i + 1;
-
-    // Compute and validate scene size.
-    const bodyLength = position.length * Float32Array.BYTES_PER_ELEMENT
-      + index.length * Int32Array.BYTES_PER_ELEMENT;
-    if (bodyLength === 0) this.fail('No mesh data found.');
-    if (bodyLength > MAX_FILESIZE) {
-      this.fail(
-        `Upload size cannot exceed ${MAX_FILESIZE / 1e6}mb, found ${bodyLength}mb. `
-        + `Please filter objects or create the navmesh locally.`
-      );
-    }
+    const { position, index } = reducer.reduce();
 
     // Convert vertices and index to Blobs, add to FormData, and return.
     const positionBlob = new Blob([new Float32Array(position)], {type: 'application/octet-stream'});
@@ -232,6 +149,7 @@ class RecastPlugin {
     formData.append('position', positionBlob);
     formData.append('index', indexBlob);
     return formData;
+
   }
 
   /**
