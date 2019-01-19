@@ -153,17 +153,28 @@ class RecastPlugin {
   }
 
   /**
-   * Attempt to pre-mark inspector-injected nodes. Unfortunately
-   * there is no reliable way to do this; we have to assume the first
-   * object named 'picker' is one of them, walk up the tree, and mark
-   * everything below its root.
+   * Mark inspector-injected nodes. The `.source` annotation was added with
+   * https://github.com/aframevr/aframe-inspector/pull/553. For older versions,
+   * we check for the `picker` name.
    */
   markInspectorNodes () {
     const scene = this.sceneEl.object3D;
+    const inspectorRootNodes = new Set();
     let inspectorNode = scene.getObjectByName('picker');
-    while (inspectorNode.parent !== scene) inspectorNode = inspectorNode.parent;
-    inspectorNode.traverse((node) => {
-      node.userData._isInspectorNode = true;
+    if (inspectorNode) {
+      while (inspectorNode.parent !== scene) inspectorNode = inspectorNode.parent;
+      inspectorRootNodes.add(inspectorNode);
+    }
+    scene.traverse((o) => {
+      if (o.userData.source === 'INSPECTOR') {
+        inspectorRootNodes.add(o);
+      }
+    });
+    Array.from(inspectorRootNodes).forEach((o) => {
+      o.userData._isInspectorNode = true;
+      o.traverse((child) => {
+        child.userData._isInspectorNode = true;
+      });
     });
   }
 
