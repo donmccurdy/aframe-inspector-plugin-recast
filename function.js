@@ -21,11 +21,9 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.use(express.static('public'));
-
 // ---------------------------------------- //
 
-app.post('/v1/build/', upload, (req, res) => {
+app.post('*', upload, (req, res) => {
 
   const files = req.files || {};
   if (!files.position || !files.index) return res.sendStatus(400);
@@ -112,7 +110,7 @@ app.post('/v1/build/', upload, (req, res) => {
 
 // ---------------------------------------- //
 
-app.listen(PORT, () => console.log(`Listening on port ${PORT}`));
+module.exports = app;
 
 // ---------------------------------------- //
 
