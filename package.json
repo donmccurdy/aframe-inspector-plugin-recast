@@ -12,7 +12,7 @@
     "dev": "concurrently \"budo src/plugin.js:bundle.js -d example -d lib --live -- -t scssify -t stringify\" \"now dev .\"",
     "dist": "browserify src/plugin.js -o public/aframe-inspector-plugin-recast.js -t scssify -t stringify",
     "predeploy": "npm run dist",
-    "deploy": "now . --target production",
+    "deploy": "now . --prod",
     "docs": "node scripts/docs"
   },
   "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
