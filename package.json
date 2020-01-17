@@ -1,6 +1,6 @@
 {
   "name": "aframe-inspector-plugin-recast",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A-Frame Inspector plugin for creating navigation meshes",
   "repository": "donmccurdy/aframe-inspector-plugin-recast",
   "main": "index.js",
