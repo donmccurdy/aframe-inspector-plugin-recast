@@ -56,7 +56,7 @@ class GeometryReducer {
 
     const boundingSphere = new THREE.Box3()
       .setFromObject( this.content )
-      .getBoundingSphere();
+      .getBoundingSphere(new THREE.Vector3());
 
     if ( boundingSphere.radius > maxExtent ) {
 
