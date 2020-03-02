@@ -9520,12 +9520,13 @@ class GeometryReducer {
   reduce () {
 
     const { maxExtent, maxFileSize } = this.options;
-
+    const newBoundingSphere = new THREE.Sphere();
+    console.log(newBoundingSphere);
     const boundingSphere = new THREE.Box3()
       .setFromObject( this.content )
-      .getBoundingSphere();
+      .getBoundingSphere(newBoundingSphere);
 
-    if ( boundingSphere.radius > maxExtent ) {
+    if ( newBoundingSphere.radius > maxExtent ) {
 
       throw new Error(
         `Scene must have a bounding radius less than ${maxExtent}m. `
