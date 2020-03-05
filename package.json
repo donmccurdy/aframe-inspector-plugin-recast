@@ -13,6 +13,7 @@
     "dist": "browserify src/plugin.js -o public/aframe-inspector-plugin-recast.js -t scssify -t stringify",
     "predeploy": "npm run dist",
     "deploy": "now . --prod",
+    "postversion": "git push && git push --tags",
     "docs": "node scripts/docs"
   },
   "author": "Don McCurdy <dm@donmccurdy.com> (https://www.donmccurdy.com)",
