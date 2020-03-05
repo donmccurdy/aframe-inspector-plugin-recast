@@ -25,7 +25,7 @@ class GeometryReducer {
   /**
    * Adds an object to the build list, ignoring its descendants.
    * Objects that do not pass test criteria are ignored.
-   * 
+   *
    * @param  {THREE.Object3D} object
    */
   add (node) {
@@ -47,7 +47,7 @@ class GeometryReducer {
   /**
    * Builds a single pair of position and index arrays from the
    * build list.
-   * 
+   *
    * @return {{position: Float32Array, index: Uint32Array}}
    */
   reduce () {
@@ -56,7 +56,7 @@ class GeometryReducer {
 
     const boundingSphere = new THREE.Box3()
       .setFromObject( this.content )
-      .getBoundingSphere();
+      .getBoundingSphere(new THREE.Sphere());
 
     if ( boundingSphere.radius > maxExtent ) {
 
