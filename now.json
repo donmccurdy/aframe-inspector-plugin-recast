@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "aframe-inspector-plugin-recast",
   "builds": [
     {"src": "function.js", "use": "@now/node"},
     {"src": "public/*", "use": "@now/static"}
@@ -9,8 +8,5 @@
     {"src": "/", "dest": "/public/index.html"},
     {"src": "/aframe-inspector-plugin-recast.js", "dest": "/public/aframe-inspector-plugin-recast.js"},
     {"src": "/v1/build/", "methods": ["POST"], "dest": "/function.js"}
-  ],
-  "alias": [
-    "recast-api.donmccurdy.com"
   ]
 }
