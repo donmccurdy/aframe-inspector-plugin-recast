@@ -1,5 +1,7 @@
 # Navigation Mesh A-Frame Inspector Plugin
 
+> 🚨 **NOTICE:** _This project is now unmaintained, for lack of a reliable [Recast](https://github.com/recastnavigation/recastnavigation) WASM build. See [#48](https://github.com/donmccurdy/aframe-inspector-plugin-recast/issues/48) for details._
+
 A plugin for the A-Frame Inspector, allowing creation of a navigation mesh while from an existing A-Frame scene. This plugin should not be used at runtime in the live scene, but only during scene creation.
 
 1. Create your scene
