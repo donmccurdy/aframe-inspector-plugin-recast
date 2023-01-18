@@ -1,6 +1,7 @@
 const RecastConfig = [
   {
     name: 'cellSize',
+    recastName: 'cs',
     default: 0.3,
     min: 0.05,
     max: 3,
@@ -9,6 +10,7 @@ const RecastConfig = [
   },
   {
     name: 'cellHeight',
+    recastName: 'ch',
     default: 0.2,
     min: 0.1,
     max: 3,
@@ -17,9 +19,10 @@ const RecastConfig = [
   },
   {
     name: 'agentHeight',
-    default: 1.6,
-    min: 0.1,
-    max: 3,
+    recastName: 'walkableHeight',
+    default: 3,
+    min: 3,
+    max: 6,
     step: 0.01,
     description:
 `Minimum floor to 'ceiling' height that will still allow the floor
@@ -29,6 +32,7 @@ value is usually set to the maximum agent height.`
   },
   {
     name: 'agentRadius',
+    recastName: 'walkableRadius',
     default: 0.2,
     min: 0.1,
     max: 3,
@@ -42,6 +46,7 @@ be considered "blocked."`
   },
   {
     name: 'agentMaxClimb',
+    recastName: 'walkableClimb',
     default: 0.5,
     min: 0.1,
     max: 5,
@@ -54,6 +59,7 @@ an agent can step.`
   },
   {
     name: 'agentMaxSlope',
+    recastName: 'walkableSlopeAngle',
     default: 30,
     min: 0,
     max: 90,
