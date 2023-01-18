@@ -7,7 +7,8 @@ const GeometryReducer = require('./three-geometry-reducer');
 const OBJExporter = require('../lib/OBJExporter');
 
 require('./components/nav-debug-pointer');
-require('./plugin.scss');
+require('./plugin.css');
+require('./spinner.css');
 
 class RecastError extends Error {}
 

@@ -1,7 +1,7 @@
 const express = require('express');
 const multer = require('multer');
 const assert = require('fluent-assert');
-const recast = require('@donmccurdy/recast');
+const Recast = require('recast-detour');
 const RecastConfig = require('./src/recast-config');
 
 const PORT = process.env.PORT || 3000;
@@ -15,6 +15,14 @@ const upload = multer({ storage: multer.memoryStorage(), limits: {fileSize: '50m
 
 // ---------------------------------------- //
 
+let recast;
+
+async function init() {
+  recast = await Recast();
+}
+
+// ---------------------------------------- //
+
 app.use(function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -23,22 +31,32 @@ app.use(function(req, res, next) {
 
 // ---------------------------------------- //
 
-app.post('*', upload, (req, res) => {
+app.post('*', upload, async (req, res) => {
+
+  await init();
 
   const files = req.files || {};
   if (!files.position || !files.index) return res.sendStatus(400);
 
-  let config;
+  const config = new recast.rcConfig();
 
   // Validate configuration.
   try {
 
-    config = RecastConfig.map((param) => {
+    // Reference:
+    // - https://github.com/BabylonJS/Babylon.js/blob/eba84f474c7e1bc1d331e76c0e13a8ccbc772a34/packages/dev/core/src/Navigation/Plugins/recastJSPlugin.ts
+
+    config.borderSize = 0;
+    config.tileSize = 0;
+
+    RecastConfig.forEach((param) => {
       assert.ok(param.name, req.query[param.name]);
       const value = Number(req.query[param.name]);
       assert.number(param.name, value).range(param.min, param.max);
-      return value;
+      config[param.recastName] = value;
     });
+
+    console.log(config);
 
   } catch (e) {
 
@@ -47,6 +65,8 @@ app.post('*', upload, (req, res) => {
     return;
 
   }
+
+  let navmesh;
 
   // Load input.
   try {
@@ -73,7 +93,14 @@ app.post('*', upload, (req, res) => {
     }
 
     console.time('recast::load');
-    recast.load(position, index);
+    navmesh = new recast.NavMesh();
+    navmesh.build(
+      Array.from(position),
+      position.length / 3,
+      Array.from(index),
+      index.length,
+      config
+    );
     console.timeEnd('recast::load');
 
   } catch (e) {
@@ -88,7 +115,10 @@ app.post('*', upload, (req, res) => {
   try {
 
     console.time('recast::build');
-    const output = recast.build.apply(recast, config).replace(/@/g, '\n');
+    const debug = navmesh.getDebugNavMesh();
+    const triangles = debug.getTriangleCount();
+    console.log({triangles, debug});
+    // TODO: extract navmesh data
     console.timeEnd('recast::build');
 
     if (output.indexOf('v') === -1) {

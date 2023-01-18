@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <title>A-Frame Inspector Recast Plugin • Example</title>
   <script src="//aframe.io/releases/0.8.2/aframe.min.js"></script>
-  <script src="//cdn.rawgit.com/donmccurdy/aframe-extras/v4.1.2/dist/aframe-extras.js"></script>
   <script src="https://rawgit.com/feiss/aframe-environment-component/master/dist/aframe-environment-component.min.js"></script>
   <script src="../bundle.js"></script>
 </head>
@@ -19,15 +18,8 @@
         <a-cursor nav-debug-pointer raycaster="objects: [nav-mesh];"></a-cursor>
       </a-entity>
     </a-entity>
-    <!-- <a-box color="red" position="0 0.5 -5" id="box"></a-box> -->
-    <!-- <a-box color="darkgreen" height="0.1" depth="20" width="20" id="ground"></a-box> -->
-    <!-- <a-entity scaleDIS="0.5 2 1" obj-model="obj: assets/nav_test.obj" color="#ccc" id="nav_test"></a-entity> -->
     <a-entity obj-model="obj: assets/dungeon.obj" color="#ccc" id="dungeon"></a-entity>
-    <!-- <a-entity gltf-model="assets/tmp/medieval_fantasy_book/scene.gltf" id="fantasy_book"></a-entity> -->
-    <!-- <a-entity obj-model="obj: assets/tmp/medieval_fantasy_book/medieval_fantasy_book.obj" id="fantasy_book"></a-entity> -->
-    <!-- <a-entity gltf-model="assets/tmp/medieval_castle_with_village/scene.gltf" id="castle_village"></a-entity> -->
     <a-entity id="navmesh" nav-mesh></a-entity>
-    <!-- <a-sky scaleDIS="0.001 0.001 0.001" color="red"></a-sky> -->
   </a-scene>
 </body>
 </html>
